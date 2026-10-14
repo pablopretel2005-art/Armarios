@@ -1,0 +1,2054 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Mi Armario</title>
+  <style>
+    :root {
+      --bg-system: #F5F5F7;
+      --card-bg: #FFFFFF;
+      --glass-bg: rgba(255, 255, 255, 0.82);
+      --text-primary: #1D1D1F;
+      --text-secondary: #86868B;
+      --accent: #0071E3;
+      --accent-dark: #1D1D1F;
+      --danger: #FF3B30;
+      --line: rgba(0, 0, 0, 0.08);
+      --cabinet-shell: #E5E2DC;
+      --cabinet-divider: #D2CEC6;
+      --cabinet-interior: #FAF9F6;
+      --cabinet-drawer: #F0EDE7;
+      --shadow-card: 0 12px 32px rgba(0, 0, 0, 0.05), 0 2px 6px rgba(0, 0, 0, 0.03);
+      --shadow-modal: 0 24px 60px rgba(0, 0, 0, 0.22);
+      --radius-xl: 26px;
+      --radius-lg: 18px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-system);
+      color: var(--text-primary);
+      padding-bottom: 64px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* 1. CABECERA ESTILO APPLE GLASSMORPHISM */
+    .apple-header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: var(--glass-bg);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      border-bottom: 1px solid var(--line);
+      padding: 14px 18px;
+    }
+
+    .header-inner {
+      max-width: 1000px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    /* Segmented Control estilo iOS */
+    .segmented-control {
+      display: inline-flex;
+      background: rgba(118, 118, 128, 0.12);
+      padding: 4px;
+      border-radius: 14px;
+      gap: 4px;
+    }
+
+    .seg-btn {
+      border: none;
+      background: transparent;
+      padding: 9px 18px;
+      border-radius: 11px;
+      font-size: 0.94rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.22s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    .seg-btn.active {
+      background: var(--card-bg);
+      color: var(--text-primary);
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.10), 0 1px 1px rgba(0, 0, 0, 0.04);
+    }
+
+    .seg-pill {
+      font-size: 0.74rem;
+      font-weight: 800;
+      background: rgba(0, 0, 0, 0.07);
+      color: var(--text-primary);
+      padding: 2px 8px;
+      border-radius: 999px;
+    }
+
+    .seg-btn.active .seg-pill {
+      background: var(--accent-dark);
+      color: #FFFFFF;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-apple-primary {
+      background: var(--accent-dark);
+      color: #FFFFFF;
+      border: none;
+      padding: 11px 20px;
+      border-radius: 999px;
+      font-size: 0.92rem;
+      font-weight: 800;
+      letter-spacing: -0.015em;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.14);
+      transition: transform 0.16s ease, background 0.16s ease;
+    }
+
+    .btn-apple-primary:hover {
+      background: #333336;
+    }
+
+    .btn-apple-primary:active {
+      transform: scale(0.96);
+    }
+
+    .btn-apple-secondary {
+      background: rgba(118, 118, 128, 0.12);
+      color: var(--text-primary);
+      border: none;
+      padding: 11px 16px;
+      border-radius: 999px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      cursor: pointer;
+      transition: background 0.16s ease, transform 0.16s ease;
+    }
+
+    .btn-apple-secondary:hover {
+      background: rgba(118, 118, 128, 0.2);
+    }
+
+    .btn-apple-secondary:active {
+      transform: scale(0.96);
+    }
+
+    /* CONTENEDOR PRINCIPAL */
+    .main-wrap {
+      max-width: 1000px;
+      margin: 24px auto 0;
+      padding: 0 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .apple-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-xl);
+      padding: 24px;
+      box-shadow: var(--shadow-card);
+      border: 1px solid rgba(0, 0, 0, 0.04);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .card-header h2 {
+      font-size: 1.45rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .card-subtitle {
+      font-size: 0.86rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    /* 2. DISEÑO MINIMALISTA DEL ARMARIO */
+    .wardrobe-shell {
+      width: 100%;
+      max-width: 780px;
+      margin: 0 auto;
+      background: var(--cabinet-shell);
+      border: 6px solid var(--cabinet-divider);
+      border-radius: 22px;
+      padding: 8px;
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.05), 0 18px 40px rgba(0,0,0,0.06);
+      user-select: none;
+    }
+
+    /* Distribución Casa de Papá */
+    .grid-papa {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      height: 500px;
+    }
+
+    .papa-top {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      height: 32%;
+    }
+
+    .papa-bottom {
+      display: grid;
+      grid-template-columns: 42% 1fr;
+      gap: 7px;
+      height: 68%;
+    }
+
+    .papa-col {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      height: 100%;
+    }
+
+    /* Distribución Casa de Mamá */
+    .grid-mama {
+      display: grid;
+      grid-template-columns: 36% 28% 1fr;
+      gap: 7px;
+      height: 540px;
+    }
+
+    .mama-col {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      height: 100%;
+    }
+
+    /* COMPARTIMENTOS MINIMALISTAS */
+    .comp-cell {
+      background: var(--cabinet-interior);
+      border: 1.5px solid var(--cabinet-divider);
+      border-radius: 14px;
+      padding: 10px 12px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      cursor: pointer;
+      overflow: hidden;
+      min-height: 0;
+      transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1),
+                  box-shadow 0.22s ease,
+                  border-color 0.22s ease,
+                  background-color 0.22s ease;
+    }
+
+    .comp-cell:hover {
+      background: #FFFFFF;
+      border-color: var(--text-primary);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+      z-index: 5;
+    }
+
+    .comp-cell:active {
+      transform: scale(0.985);
+    }
+
+    .comp-cell.type-cajon {
+      background: var(--cabinet-drawer);
+    }
+
+    .comp-cell.type-cajon:hover {
+      background: #FFFFFF;
+      transform: translateY(3px) scale(1.015);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.11);
+    }
+
+    .drawer-pill-handle {
+      width: 36px;
+      height: 5px;
+      border-radius: 999px;
+      background: #B8B3A8;
+      margin: 0 auto 3px;
+      flex-shrink: 0;
+    }
+
+    .comp-cell.type-inactivo {
+      background: repeating-linear-gradient(
+        -45deg,
+        #EBE8E2,
+        #EBE8E2 8px,
+        #E2DFD8 8px,
+        #E2DFD8 16px
+      );
+      border-style: dashed;
+      cursor: default;
+      opacity: 0.72;
+    }
+
+    .comp-cell.type-inactivo:hover {
+      transform: none;
+      border-color: var(--cabinet-divider);
+      box-shadow: none;
+      background: repeating-linear-gradient(
+        -45deg,
+        #EBE8E2,
+        #EBE8E2 8px,
+        #E2DFD8 8px,
+        #E2DFD8 16px
+      );
+    }
+
+    .comp-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 4px;
+      z-index: 3;
+      flex-shrink: 0;
+    }
+
+    .comp-title {
+      font-size: 0.82rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .comp-count {
+      font-size: 0.72rem;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.06);
+      color: var(--text-secondary);
+      flex-shrink: 0;
+    }
+
+    .comp-cell.has-items .comp-count {
+      background: var(--text-primary);
+      color: #FFFFFF;
+    }
+
+    /* COLGADORES CON PRENDAS LARGAS (CASI HASTA EL FONDO SIN TOCARLO) */
+    .comp-cell.type-colgador {
+      justify-content: flex-start;
+      padding-bottom: 10px; /* Margen inferior para que nunca toquen el suelo */
+    }
+
+    .hanging-zone {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      min-height: 0;
+      margin-top: 6px;
+      position: relative;
+    }
+
+    .closet-rod {
+      width: 100%;
+      height: 6px;
+      background: linear-gradient(180deg, #D8D8DC 0%, #98989F 100%);
+      border-radius: 999px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.12);
+      flex-shrink: 0;
+      z-index: 1;
+    }
+
+    .hanging-clothes-row {
+      flex: 1;
+      display: flex;
+      align-items: stretch;
+      gap: 4px;
+      margin-top: -3px;
+      padding: 0 2px 4px; /* Espacio limpio antes del borde inferior */
+      overflow-x: auto;
+      overflow-y: hidden;
+      z-index: 2;
+      scrollbar-width: none;
+    }
+
+    .hanging-clothes-row::-webkit-scrollbar {
+      display: none;
+    }
+
+    .long-hanger-slot {
+      height: 94%; /* Cuelga casi hasta el fondo sin tocar la base */
+      width: 48px;
+      flex-shrink: 0;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.12));
+      transition: transform 0.2s ease;
+    }
+
+    .comp-cell:hover .long-hanger-slot:nth-child(odd) {
+      transform: translateY(1px) rotate(-1deg);
+    }
+
+    .comp-cell:hover .long-hanger-slot:nth-child(even) {
+      transform: translateY(1px) rotate(1deg);
+    }
+
+    .qty-mini-badge {
+      position: absolute;
+      bottom: 6px;
+      right: 2px;
+      background: rgba(29, 29, 31, 0.88);
+      color: #FFFFFF;
+      font-size: 0.65rem;
+      font-weight: 800;
+      padding: 1px 5px;
+      border-radius: 999px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    /* VISTA DE PRENDAS EN BALDAS Y CAJONES */
+    .shelf-items-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 5px;
+      margin-top: auto;
+      padding-top: 4px;
+      overflow: hidden;
+    }
+
+    .shelf-piece {
+      position: relative;
+      width: 34px;
+      height: 28px;
+      filter: drop-shadow(0 2px 3px rgba(0,0,0,0.1));
+      flex-shrink: 0;
+    }
+
+    /* 3. FILTRO E INVENTARIO INFERIOR ESTILO APPLE */
+    .filter-bar {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1fr 1fr auto;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .apple-input,
+    .apple-select {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1px solid rgba(0,0,0,0.1);
+      border-radius: var(--radius-md);
+      background: var(--bg-system);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+      outline: none;
+      transition: border-color 0.15s ease, background 0.15s ease;
+    }
+
+    .apple-input:focus,
+    .apple-select:focus {
+      background: #FFFFFF;
+      border-color: var(--text-primary);
+    }
+
+    .inventory-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(235px, 1fr));
+      gap: 14px;
+    }
+
+    .garment-tile {
+      background: var(--bg-system);
+      border-radius: var(--radius-lg);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      border: 1px solid rgba(0,0,0,0.04);
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .garment-tile:hover {
+      background: #FFFFFF;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+      transform: translateY(-2px);
+    }
+
+    .tile-top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .tile-icon-box {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      background: #FFFFFF;
+      border: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .tile-qty-tag {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      background: var(--text-primary);
+      color: #FFFFFF;
+      font-size: 0.72rem;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 999px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+    }
+
+    .tile-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .tile-title {
+      font-size: 0.98rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .tile-sub {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 3px;
+    }
+
+    .color-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      border: 1px solid rgba(0,0,0,0.2);
+      display: inline-block;
+      flex-shrink: 0;
+    }
+
+    .tile-location {
+      background: #FFFFFF;
+      border-radius: var(--radius-sm);
+      padding: 7px 10px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .tile-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    /* Stepper de cantidad en tarjetas */
+    .inline-stepper {
+      display: inline-flex;
+      align-items: center;
+      background: #FFFFFF;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 2px;
+      gap: 4px;
+    }
+
+    .step-mini-btn {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: none;
+      background: var(--bg-system);
+      font-weight: 800;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-primary);
+    }
+
+    .step-mini-btn:hover {
+      background: #E5E5EA;
+    }
+
+    .step-mini-val {
+      font-size: 0.8rem;
+      font-weight: 800;
+      min-width: 24px;
+      text-align: center;
+    }
+
+    .btn-chip {
+      border: none;
+      background: #FFFFFF;
+      border: 1px solid var(--line);
+      padding: 6px 11px;
+      border-radius: 999px;
+      font-size: 0.76rem;
+      font-weight: 800;
+      cursor: pointer;
+      color: var(--text-primary);
+    }
+
+    .btn-chip:hover {
+      background: #EBEBF0;
+    }
+
+    .btn-chip.danger {
+      color: var(--danger);
+    }
+
+    /* MODALES ESTILO iOS SHEET */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.42);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 14px;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-sheet {
+      background: var(--card-bg);
+      border-radius: var(--radius-xl);
+      width: 100%;
+      max-width: 560px;
+      max-height: 92vh;
+      overflow-y: auto;
+      padding: 22px;
+      box-shadow: var(--shadow-modal);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .sheet-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .sheet-header h3 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+    }
+
+    .btn-close-circle {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      background: var(--bg-system);
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .field-label {
+      font-size: 0.76rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    /* CONTROL DE CANTIDAD ESTILO APPLE */
+    .qty-control-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: var(--bg-system);
+      padding: 8px 12px;
+      border-radius: var(--radius-md);
+      flex-wrap: wrap;
+    }
+
+    .qty-stepper-big {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #FFFFFF;
+      padding: 4px 6px;
+      border-radius: 999px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+
+    .qty-btn-big {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: none;
+      background: var(--bg-system);
+      color: var(--text-primary);
+      font-size: 1.15rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .qty-btn-big:active {
+      transform: scale(0.92);
+    }
+
+    .qty-input-number {
+      width: 48px;
+      text-align: center;
+      border: none;
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      background: transparent;
+      outline: none;
+    }
+
+    .qty-presets {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .preset-pill {
+      border: none;
+      background: #FFFFFF;
+      color: var(--text-primary);
+      padding: 6px 11px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+
+    .preset-pill.active {
+      background: var(--text-primary);
+      color: #FFFFFF;
+    }
+
+    /* MICRO-ARMARIO PARA PULSAR Y GUARDAR */
+    .picker-banner {
+      background: #F0F6FF;
+      color: var(--accent);
+      padding: 9px 12px;
+      border-radius: 12px;
+      font-size: 0.84rem;
+      font-weight: 800;
+      text-align: center;
+    }
+
+    .mini-wardrobe-shell {
+      background: var(--cabinet-shell);
+      border: 4px solid var(--cabinet-divider);
+      border-radius: 16px;
+      padding: 6px;
+    }
+
+    .mini-wardrobe-shell .grid-papa {
+      height: 250px;
+    }
+
+    .mini-wardrobe-shell .grid-mama {
+      height: 270px;
+    }
+
+    .mini-slot {
+      background: var(--cabinet-interior);
+      border: 1.5px solid var(--cabinet-divider);
+      border-radius: 10px;
+      padding: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .mini-slot:hover,
+    .mini-slot:active {
+      background: var(--text-primary);
+      color: #FFFFFF;
+      border-color: var(--text-primary);
+      transform: scale(1.02);
+    }
+
+    .mini-slot.disabled {
+      background: repeating-linear-gradient(-45deg, #EBE8E2, #EBE8E2 6px, #E2DFD8 6px, #E2DFD8 12px);
+      color: var(--text-secondary);
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    .mini-slot.disabled:hover {
+      background: repeating-linear-gradient(-45deg, #EBE8E2, #EBE8E2 6px, #E2DFD8 6px, #E2DFD8 12px);
+      color: var(--text-secondary);
+      transform: none;
+    }
+
+    /* LISTAS EDITABLES */
+    .list-row-apple {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: var(--bg-system);
+      padding: 10px 14px;
+      border-radius: 14px;
+    }
+
+    .apple-toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(12px);
+      background: rgba(29, 29, 31, 0.92);
+      backdrop-filter: blur(12px);
+      color: #FFFFFF;
+      padding: 12px 22px;
+      border-radius: 999px;
+      font-size: 0.88rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      z-index: 300;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.22);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.22s ease, transform 0.22s ease;
+    }
+
+    .apple-toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 720px) {
+      .header-inner {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .segmented-control {
+        width: 100%;
+      }
+      .seg-btn {
+        flex: 1;
+        justify-content: center;
+        padding: 10px 8px;
+        font-size: 0.86rem;
+      }
+      .header-actions {
+        justify-content: space-between;
+      }
+      .btn-apple-primary {
+        flex: 1;
+        justify-content: center;
+      }
+      .filter-bar {
+        grid-template-columns: 1fr 1fr;
+      }
+      .filter-bar input {
+        grid-column: 1 / -1;
+      }
+      .grid-papa {
+        height: 440px;
+      }
+      .grid-mama {
+        height: 480px;
+      }
+      .comp-title {
+        font-size: 0.72rem;
+      }
+      .long-hanger-slot {
+        width: 38px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. BARRA SUPERIOR ESTILO APPLE -->
+  <header class="apple-header">
+    <div class="header-inner">
+      <div class="segmented-control" role="tablist" aria-label="Cambiar de casa">
+        <button type="button" class="seg-btn active" id="tabPapa" onclick="switchHouse('papa')">
+          Casa de Papá <span class="seg-pill" id="badgePapa">0</span>
+        </button>
+        <button type="button" class="seg-btn" id="tabMama" onclick="switchHouse('mama')">
+          Casa de Mamá <span class="seg-pill" id="badgeMama">0</span>
+        </button>
+      </div>
+
+      <div class="header-actions">
+        <button type="button" class="btn-apple-primary" onclick="openAddModal()">
+          ＋ Añadir ropa
+        </button>
+        <button type="button" class="btn-apple-secondary" onclick="openListsModal()">
+          ⚙️ Listas
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-wrap">
+    <!-- 2. ARMARIO INTERACTIVO EN EL CENTRO -->
+    <section class="apple-card">
+      <div class="card-header">
+        <div>
+          <h2 id="mainWardrobeTitle">Armario Casa de Papá</h2>
+          <p class="card-subtitle">Toca cualquier balda, cajón o colgador para ver o gestionar lo que hay dentro.</p>
+        </div>
+      </div>
+
+      <div class="wardrobe-shell" id="mainWardrobeShell"></div>
+    </section>
+
+    <!-- 3. FILTRO E INVENTARIO DE ROPA -->
+    <section class="apple-card">
+      <div class="card-header">
+        <h2>Inventario</h2>
+        <span class="card-subtitle" id="totalInventorySubtitle">0 unidades en total</span>
+      </div>
+
+      <div class="filter-bar">
+        <input type="search" id="searchInput" class="apple-input" placeholder="Buscar prenda, color o nota..." oninput="renderInventory()" />
+        <select id="filterHouse" class="apple-select" onchange="renderInventory()">
+          <option value="">Ambas casas</option>
+          <option value="papa">Casa de Papá</option>
+          <option value="mama">Casa de Mamá</option>
+        </select>
+        <select id="filterType" class="apple-select" onchange="renderInventory()">
+          <option value="">Todos los tipos</option>
+        </select>
+        <select id="filterColor" class="apple-select" onchange="renderInventory()">
+          <option value="">Todos los colores</option>
+        </select>
+        <button type="button" class="btn-apple-secondary" onclick="resetFilters()">Limpiar</button>
+      </div>
+
+      <div class="inventory-grid" id="inventoryGrid"></div>
+    </section>
+  </main>
+
+  <!-- MODAL 1: AÑADIR ROPA (O MOVERLA) CON CANTIDAD Y MICRO-ARMARIO -->
+  <div class="modal-backdrop" id="modalAdd">
+    <div class="modal-sheet">
+      <div class="sheet-header">
+        <h3 id="addSheetTitle">Añadir ropa</h3>
+        <button type="button" class="btn-close-circle" onclick="closeAddModal()">✕</button>
+      </div>
+
+      <div id="addFieldsBlock" style="display:flex; flex-direction:column; gap:14px;">
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+          <div>
+            <label class="field-label" for="selType">Tipo de prenda</label>
+            <select id="selType" class="apple-select"></select>
+          </div>
+          <div>
+            <label class="field-label" for="selColor">Color</label>
+            <select id="selColor" class="apple-select"></select>
+          </div>
+        </div>
+
+        <!-- Selector de unidades (1 o varias a la vez, ej. 6 calzoncillos) -->
+        <div>
+          <label class="field-label">Cantidad (unidades)</label>
+          <div class="qty-control-row">
+            <div class="qty-stepper-big">
+              <button type="button" class="qty-btn-big" onclick="stepAddQty(-1)">−</button>
+              <input type="number" id="inputQty" class="qty-input-number" value="1" min="1" max="99" onchange="syncQtyPresets()" />
+              <button type="button" class="qty-btn-big" onclick="stepAddQty(1)">＋</button>
+            </div>
+            <div class="qty-presets" id="qtyPresetsRow">
+              <button type="button" class="preset-pill active" data-q="1" onclick="setAddQty(1)">×1</button>
+              <button type="button" class="preset-pill" data-q="2" onclick="setAddQty(2)">×2</button>
+              <button type="button" class="preset-pill" data-q="3" onclick="setAddQty(3)">×3</button>
+              <button type="button" class="preset-pill" data-q="6" onclick="setAddQty(6)">×6</button>
+              <button type="button" class="preset-pill" data-q="10" onclick="setAddQty(10)">×10</button>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label class="field-label" for="inputNote">Marca o detalle (opcional)</label>
+          <input type="text" id="inputNote" class="apple-input" placeholder="Ej. Nike, Calvin Klein, deporte..." />
+        </div>
+      </div>
+
+      <div>
+        <label class="field-label">¿Dónde está? Elige casa y toca el hueco:</label>
+        <div class="segmented-control" style="width:100%; margin-bottom:10px;">
+          <button type="button" class="seg-btn active" id="pickerBtnPapa" style="flex:1; justify-content:center;" onclick="switchPickerHouse('papa')">
+            Casa de Papá
+          </button>
+          <button type="button" class="seg-btn" id="pickerBtnMama" style="flex:1; justify-content:center;" onclick="switchPickerHouse('mama')">
+            Casa de Mamá
+          </button>
+        </div>
+
+        <div class="picker-banner" id="pickerBannerText">
+          👇 Toca la balda, cajón o colgador y se guardará al instante
+        </div>
+
+        <div class="mini-wardrobe-shell" id="miniWardrobeContainer" style="margin-top:8px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: VER CONTENIDO DE UNA BALDA, CAJÓN O COLGADOR -->
+  <div class="modal-backdrop" id="modalCompartment">
+    <div class="modal-sheet">
+      <div class="sheet-header">
+        <h3 id="compSheetTitle">Cajón 1</h3>
+        <button type="button" class="btn-close-circle" onclick="closeCompartmentModal()">✕</button>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span class="card-subtitle" id="compSheetSub">0 prendas aquí</span>
+        <button type="button" class="btn-apple-primary" id="btnAddInsideComp" style="padding:8px 16px; font-size:0.84rem;">
+          ＋ Añadir aquí
+        </button>
+      </div>
+
+      <div id="compItemsContainer" style="display:flex; flex-direction:column; gap:8px; max-height:380px; overflow-y:auto;"></div>
+    </div>
+  </div>
+
+  <!-- MODAL 3: EDITAR LISTAS DE TIPOS DE ROPA, COLORES Y COPIAS DE SEGURIDAD -->
+  <div class="modal-backdrop" id="modalLists">
+    <div class="modal-sheet">
+      <div class="sheet-header">
+        <h3>Listas y Datos</h3>
+        <button type="button" class="btn-close-circle" onclick="closeListsModal()">✕</button>
+      </div>
+
+      <div class="segmented-control" style="width:100%;">
+        <button type="button" class="seg-btn active" id="tabConfigTypes" style="flex:1; justify-content:center;" onclick="switchListsTab('types')">
+          Tipos de ropa
+        </button>
+        <button type="button" class="seg-btn" id="tabConfigColors" style="flex:1; justify-content:center;" onclick="switchListsTab('colors')">
+          Colores
+        </button>
+        <button type="button" class="seg-btn" id="tabConfigBackup" style="flex:1; justify-content:center;" onclick="switchListsTab('backup')">
+          Copia
+        </button>
+      </div>
+
+      <!-- Editar Tipos de prenda -->
+      <div id="panelConfigTypes" style="display:flex; flex-direction:column; gap:12px;">
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <input type="text" id="newTypeInput" class="apple-input" placeholder="Nuevo tipo (ej. Camisa, Bañador...)" style="flex:1; min-width:160px;" />
+          <select id="newTypeShape" class="apple-select" style="width:auto;">
+            <option value="camiseta">Forma: Camiseta</option>
+            <option value="polo">Forma: Polo / Camisa</option>
+            <option value="sudadera">Forma: Sudadera / Jersey</option>
+            <option value="abrigo">Forma: Abrigo / Chaqueta</option>
+            <option value="pantalon">Forma: Pantalón / Deporte</option>
+            <option value="interior">Forma: Ropa interior / Calcetines</option>
+            <option value="zapatos">Forma: Zapatos</option>
+          </select>
+          <button type="button" class="btn-apple-primary" onclick="addTypeItem()">Añadir</button>
+        </div>
+        <div id="typesListContainer" style="display:flex; flex-direction:column; gap:8px; max-height:280px; overflow-y:auto;"></div>
+      </div>
+
+      <!-- Editar Colores -->
+      <div id="panelConfigColors" style="display:none; flex-direction:column; gap:12px;">
+        <div style="display:flex; gap:8px; align-items:center;">
+          <input type="color" id="newColorPicker" value="#1B365D" style="width:48px; height:44px; border:none; border-radius:10px; cursor:pointer; background:none;" />
+          <input type="text" id="newColorInput" class="apple-input" placeholder="Nombre del color (ej. Azul marino, Gris claro...)" style="flex:1;" />
+          <button type="button" class="btn-apple-primary" onclick="addColorItem()">Añadir</button>
+        </div>
+        <div id="colorsListContainer" style="display:flex; flex-direction:column; gap:8px; max-height:280px; overflow-y:auto;"></div>
+      </div>
+
+      <!-- Copia de seguridad -->
+      <div id="panelConfigBackup" style="display:none; flex-direction:column; gap:12px;">
+        <p class="card-subtitle">Todo se guarda automáticamente en la memoria de este navegador. Puedes descargar una copia de respaldo cuando quieras.</p>
+        <button type="button" class="btn-apple-primary" style="justify-content:center;" onclick="exportDataJson()">
+          ⬇️ Descargar copia de seguridad (.json)
+        </button>
+        <label class="btn-apple-secondary" style="text-align:center; cursor:pointer;">
+          ⬆️ Restaurar copia de seguridad (.json)
+          <input type="file" accept=".json,application/json" style="display:none;" onchange="importDataJson(event)" />
+        </label>
+        <hr style="border:none; border-top:1px solid var(--line); margin:4px 0;" />
+        <button type="button" class="btn-apple-secondary" style="color:var(--danger);" onclick="clearAllInventory()">
+          🗑️ Vaciar todas las prendas
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="apple-toast" id="appleToast"></div>
+
+  <script>
+    /******************************************************************
+     * 1. ESTRUCTURA DE LOS DOS ARMARIOS (CASA DE PAPÁ Y CASA DE MAMÁ)
+     ******************************************************************/
+    const WARDROBES = {
+      papa: {
+        name: "Armario Casa de Papá",
+        compartments: [
+          { id: "papa-balda-1", name: "Balda 1", type: "balda", zone: "top", ratio: 1 },
+          { id: "papa-balda-2", name: "Balda 2", type: "balda", zone: "top", ratio: 1 },
+          { id: "papa-nada", name: "Nada", type: "inactivo", zone: "bottom-left", ratio: 1 },
+          { id: "papa-balda-3", name: "Balda 3", type: "balda", zone: "bottom-left", ratio: 1 },
+          { id: "papa-balda-4", name: "Balda 4 (Zapatos)", type: "zapatos", zone: "bottom-left", ratio: 1 },
+          { id: "papa-colgador-1", name: "Colgador 1", type: "colgador", zone: "bottom-right", ratio: 3 }
+        ]
+      },
+      mama: {
+        name: "Armario Casa de Mamá",
+        compartments: [
+          { id: "mama-colgador-1", name: "Colgador 1", type: "colgador", zone: "col-left", ratio: 2.35 },
+          { id: "mama-cajon-1", name: "Cajón 1", type: "cajon", zone: "col-left", ratio: 0.68 },
+          { id: "mama-cajon-2", name: "Cajón 2", type: "cajon", zone: "col-left", ratio: 0.68 },
+          { id: "mama-cajon-3", name: "Cajón 3", type: "cajon", zone: "col-left", ratio: 0.68 },
+          { id: "mama-cajon-4", name: "Cajón 4", type: "cajon", zone: "col-left", ratio: 0.68 },
+          { id: "mama-balda-1", name: "Balda 1", type: "balda", zone: "col-center", ratio: 1 },
+          { id: "mama-balda-2", name: "Balda 2", type: "balda", zone: "col-center", ratio: 1 },
+          { id: "mama-balda-3", name: "Balda 3", type: "balda", zone: "col-center", ratio: 1 },
+          { id: "mama-balda-4", name: "Balda 4", type: "balda", zone: "col-center", ratio: 1 },
+          { id: "mama-balda-5", name: "Balda 5 (Zapatos)", type: "zapatos", zone: "col-center", ratio: 1 },
+          { id: "mama-colgador-2", name: "Colgador 2", type: "colgador", zone: "col-right", ratio: 5 }
+        ]
+      }
+    };
+
+    const DEFAULT_TYPES = [
+      { name: "Camiseta", shape: "camiseta" },
+      { name: "Polo", shape: "polo" },
+      { name: "Sudadera", shape: "sudadera" },
+      { name: "Abrigo", shape: "abrigo" },
+      { name: "Ropa de deporte", shape: "pantalon" },
+      { name: "Pantalón", shape: "pantalon" },
+      { name: "Calzoncillos", shape: "interior" },
+      { name: "Calcetines", shape: "interior" },
+      { name: "Zapatos", shape: "zapatos" }
+    ];
+
+    const DEFAULT_COLORS = [
+      { name: "Azul oscuro", hex: "#1B365D" },
+      { name: "Negro", hex: "#1D1D1F" },
+      { name: "Gris", hex: "#8E9399" },
+      { name: "Blanco", hex: "#FFFFFF" },
+      { name: "Azul claro", hex: "#5AC8FA" },
+      { name: "Verde", hex: "#30804C" },
+      { name: "Rojo", hex: "#E03B3B" },
+      { name: "Beige", hex: "#D8C8B0" },
+      { name: "Marrón", hex: "#6E4B3A" }
+    ];
+
+    const DEFAULT_CLOTHES = [
+      { id: "c1", type: "Sudadera", color: "Gris", qty: 1, note: "Adidas", house: "papa", compId: "papa-colgador-1" },
+      { id: "c2", type: "Abrigo", color: "Azul oscuro", qty: 1, note: "Cazadora", house: "papa", compId: "papa-colgador-1" },
+      { id: "c3", type: "Ropa de deporte", color: "Negro", qty: 2, note: "Nike", house: "papa", compId: "papa-balda-3" },
+      { id: "c4", type: "Zapatos", color: "Blanco", qty: 1, note: "Zapatillas", house: "papa", compId: "papa-balda-4" },
+      { id: "c5", type: "Polo", color: "Azul oscuro", qty: 1, note: "Ralph Lauren", house: "mama", compId: "mama-colgador-1" },
+      { id: "c6", type: "Camiseta", color: "Blanco", qty: 3, note: "Básicas", house: "mama", compId: "mama-cajon-1" },
+      { id: "c7", type: "Calzoncillos", color: "Negro", qty: 6, note: "Pack Bóxers", house: "mama", compId: "mama-cajon-2" },
+      { id: "c8", type: "Abrigo", color: "Negro", qty: 1, note: "Abrigo largo", house: "mama", compId: "mama-colgador-2" },
+      { id: "c9", type: "Zapatos", color: "Negro", qty: 1, note: "Deportivas", house: "mama", compId: "mama-balda-5" }
+    ];
+
+    /******************************************************************
+     * 2. ESTADO Y PERSISTENCIA LOCAL
+     ******************************************************************/
+    const state = {
+      activeHouse: "papa",
+      pickerHouse: "papa",
+      movingGarmentId: null,
+      openCompModal: null, // { house, compId }
+      types: [],
+      colors: [],
+      clothes: []
+    };
+
+    function loadState() {
+      try {
+        const t = localStorage.getItem("miarmario_v2_types");
+        const c = localStorage.getItem("miarmario_v2_colors");
+        const g = localStorage.getItem("miarmario_v2_clothes");
+
+        state.types = t ? JSON.parse(t) : [...DEFAULT_TYPES];
+        state.colors = c ? JSON.parse(c) : [...DEFAULT_COLORS];
+        if (g) {
+          const parsed = JSON.parse(g);
+          state.clothes = parsed.map(item => ({
+            ...item,
+            qty: Math.max(1, parseInt(item.qty, 10) || 1)
+          }));
+        } else {
+          state.clothes = [...DEFAULT_CLOTHES];
+        }
+      } catch (err) {
+        state.types = [...DEFAULT_TYPES];
+        state.colors = [...DEFAULT_COLORS];
+        state.clothes = [...DEFAULT_CLOTHES];
+      }
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem("miarmario_v2_types", JSON.stringify(state.types));
+        localStorage.setItem("miarmario_v2_colors", JSON.stringify(state.colors));
+        localStorage.setItem("miarmario_v2_clothes", JSON.stringify(state.clothes));
+      } catch (err) {
+        console.warn("No se pudo guardar en localStorage", err);
+      }
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById("appleToast");
+      t.textContent = msg;
+      t.classList.add("show");
+      clearTimeout(t._timer);
+      t._timer = setTimeout(() => t.classList.remove("show"), 2600);
+    }
+
+    function getColorHex(colorName) {
+      const f = state.colors.find(c => c.name.toLowerCase() === String(colorName).toLowerCase());
+      return f ? f.hex : "#8E9399";
+    }
+
+    function getTypeShape(typeName) {
+      const f = state.types.find(t => t.name.toLowerCase() === String(typeName).toLowerCase());
+      return f ? f.shape : "camiseta";
+    }
+
+    /******************************************************************
+     * 3. SVGS DE PRENDAS LARGAS PARA COLGADOR Y DOBLADAS PARA BALDAS
+     ******************************************************************/
+    // Prendas colgadas estilizadas y largas (ocupan casi toda la altura del colgador sin tocar el fondo)
+    function getTallHangingSvg(typeName, colorName) {
+      const fill = getColorHex(colorName);
+      const shape = getTypeShape(typeName);
+      const isDark = fill.toLowerCase() === "#1d1d1f" || fill.toLowerCase() === "#222222" || fill.toLowerCase() === "#1b365d";
+      const detail = isDark ? "rgba(255,255,255,0.34)" : "rgba(0,0,0,0.22)";
+
+      const hangerHeader = `
+        <path d="M26 2 C26 0.5, 30 0.5, 30 3 C30 5, 26 5.5, 26 8 L26 11" stroke="#8E8E93" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+        <path d="M9 19 L26 11 L43 19" stroke="#C49A6C" stroke-width="3.4" fill="none" stroke-linecap="round"/>
+      `;
+
+      if (shape === "abrigo") {
+        return `<svg viewBox="0 0 52 150" width="100%" height="100%" preserveAspectRatio="none">
+          ${hangerHeader}
+          <path d="M11 17 L41 17 L50 56 L43 60 L41 34 L41 146 L11 146 L11 34 L9 60 L2 56 Z" fill="${fill}" stroke="#1D1D1F" stroke-width="1.8" stroke-linejoin="round"/>
+          <path d="M19 17 L26 42 L33 17" fill="none" stroke="${detail}" stroke-width="1.8"/>
+          <line x1="26" y1="42" x2="26" y2="146" stroke="${detail}" stroke-width="1.6"/>
+        </svg>`;
+      }
+
+      if (shape === "sudadera") {
+        return `<svg viewBox="0 0 52 150" width="100%" height="100%" preserveAspectRatio="none">
+          ${hangerHeader}
+          <path d="M16 16 C16 9, 36 9, 36 16 L41 18 L50 56 L43 60 L40 34 L40 142 L12 142 L12 34 L9 60 L2 56 L11 18 Z" fill="${fill}" stroke="#1D1D1F" stroke-width="1.8" stroke-linejoin="round"/>
+          <line x1="23" y1="20" x2="23" y2="38" stroke="${detail}" stroke-width="1.6" stroke-linecap="round"/>
+          <line x1="29" y1="20" x2="29" y2="38" stroke="${detail}" stroke-width="1.6" stroke-linecap="round"/>
+          <rect x="17" y="102" width="18" height="22" rx="4" fill="none" stroke="${detail}" stroke-width="1.5"/>
+        </svg>`;
+      }
+
+      if (shape === "polo") {
+        return `<svg viewBox="0 0 52 150" width="100%" height="100%" preserveAspectRatio="none">
+          ${hangerHeader}
+          <path d="M12 17 L40 17 L49 44 L42 50 L39 34 L39 140 L13 140 L13 34 L10 50 L3 44 Z" fill="${fill}" stroke="#1D1D1F" stroke-width="1.8" stroke-linejoin="round"/>
+          <path d="M18 17 L26 30 L34 17" fill="none" stroke="${detail}" stroke-width="1.8"/>
+          <line x1="26" y1="30" x2="26" y2="48" stroke="${detail}" stroke-width="1.8"/>
+        </svg>`;
+      }
+
+      if (shape === "pantalon") {
+        return `<svg viewBox="0 0 52 150" width="100%" height="100%" preserveAspectRatio="none">
+          ${hangerHeader}
+          <line x1="11" y1="19" x2="41" y2="19" stroke="#6E6E73" stroke-width="3"/>
+          <path d="M13 19 L39 19 L41 145 L28 145 L26 62 L24 145 L11 145 Z" fill="${fill}" stroke="#1D1D1F" stroke-width="1.8" stroke-linejoin="round"/>
+        </svg>`;
+      }
+
+      // Camiseta larga en percha por defecto
+      return `<svg viewBox="0 0 52 150" width="100%" height="100%" preserveAspectRatio="none">
+        ${hangerHeader}
+        <path d="M13 17 L19 17 C21 24, 31 24, 33 17 L39 17 L49 42 L42 49 L39 34 L39 140 L13 140 L13 34 L10 49 L3 42 Z" fill="${fill}" stroke="#1D1D1F" stroke-width="1.8" stroke-linejoin="round"/>
+      </svg>`;
+    }
+
+    // Icono limpio para baldas, cajones y fichas del inventario
+    function getCompactGarmentSvg(typeName, colorName) {
+      const fill = getColorHex(colorName);
+      const shape = getTypeShape(typeName);
+      const isDark = fill.toLowerCase() === "#1d1d1f" || fill.toLowerCase() === "#222222" || fill.toLowerCase() === "#1b365d";
+      const detail = isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.25)";
+
+      if (shape === "zapatos") {
+        return `<svg viewBox="0 0 48 36" width="100%" height="100%">
+          <path d="M6 26 L18 12 L26 18 L40 20 C43 21, 44 24, 44 28 L4 28 C4 26, 5 26, 6 26 Z" fill="${fill}" stroke="#1D1D1F" stroke-width="1.8" stroke-linejoin="round"/>
+          <rect x="4" y="27" width="40" height="4" rx="2" fill="#F2F2F7" stroke="#1D1D1F" stroke-width="1.4"/>
+          <line x1="19" y1="15" x2="23" y2="18" stroke="${detail}" stroke-width="1.8"/>
+        </svg>`;
+      }
+
+      if (shape === "interior") {
+        return `<svg viewBox="0 0 48 36" width="100%" height="100%">
+          <path d="M9 8 L39 8 L41 27 L27 27 L24 19 L21 27 L7 27 Z" fill="${fill}" stroke="#1D1D1F" stroke-width="1.8" stroke-linejoin="round"/>
+          <line x1="9" y1="12.5" x2="39" y2="12.5" stroke="${detail}" stroke-width="1.6"/>
+        </svg>`;
+      }
+
+      if (shape === "pantalon") {
+        return `<svg viewBox="0 0 48 44" width="100%" height="100%">
+          <path d="M13 6 L35 6 L38 38 L26 38 L24 18 L22 38 L10 38 Z" fill="${fill}" stroke="#1D1D1F" stroke-width="1.8" stroke-linejoin="round"/>
+        </svg>`;
+      }
+
+      return `<svg viewBox="0 0 48 44" width="100%" height="100%">
+        <path d="M13 8 L19 8 C21 12, 27 12, 29 8 L35 8 L44 17 L38 23 L34 18 L34 38 L14 38 L14 18 L10 23 L4 17 Z" fill="${fill}" stroke="#1D1D1F" stroke-width="1.8" stroke-linejoin="round"/>
+      </svg>`;
+    }
+
+    /******************************************************************
+     * 4. RENDERIZAR EL ARMARIO EN EL CENTRO
+     ******************************************************************/
+    window.switchHouse = function(house) {
+      state.activeHouse = house;
+      document.getElementById("tabPapa").classList.toggle("active", house === "papa");
+      document.getElementById("tabMama").classList.toggle("active", house === "mama");
+      renderWardrobe();
+    };
+
+    function createCompartmentNode(comp, house) {
+      const items = state.clothes.filter(c => c.house === house && c.compId === comp.id);
+      const totalUnits = items.reduce((sum, item) => sum + (item.qty || 1), 0);
+
+      const cell = document.createElement("div");
+      cell.className = `comp-cell type-${comp.type} ${totalUnits > 0 ? "has-items" : ""}`;
+      cell.style.flex = String(comp.ratio || 1);
+
+      if (comp.type === "inactivo") {
+        cell.innerHTML = `
+          <div class="comp-head">
+            <span class="comp-title">Nada</span>
+            <span class="comp-count">Sin uso</span>
+          </div>
+        `;
+        return cell;
+      }
+
+      const handleHtml = comp.type === "cajon" ? `<div class="drawer-pill-handle"></div>` : "";
+      let bodyHtml = "";
+
+      if (comp.type === "colgador") {
+        const hangers = items.map(item => `
+          <div class="long-hanger-slot" title="${item.type} (${item.color}) ×${item.qty || 1}">
+            ${getTallHangingSvg(item.type, item.color)}
+            ${(item.qty || 1) > 1 ? `<span class="qty-mini-badge">×${item.qty}</span>` : ""}
+          </div>
+        `).join("");
+
+        bodyHtml = `
+          <div class="hanging-zone">
+            <div class="closet-rod"></div>
+            <div class="hanging-clothes-row">${hangers}</div>
+          </div>
+        `;
+      } else {
+        const pieces = items.slice(0, 8).map(item => `
+          <div class="shelf-piece" title="${item.type} (${item.color}) ×${item.qty || 1}">
+            ${getCompactGarmentSvg(item.type, item.color)}
+            ${(item.qty || 1) > 1 ? `<span class="qty-mini-badge" style="bottom:-2px; right:-4px;">×${item.qty}</span>` : ""}
+          </div>
+        `).join("");
+
+        bodyHtml = `<div class="shelf-items-wrap">${pieces}</div>`;
+      }
+
+      cell.innerHTML = `
+        ${handleHtml}
+        <div class="comp-head">
+          <span class="comp-title">${comp.name}</span>
+          <span class="comp-count">${totalUnits}</span>
+        </div>
+        ${bodyHtml}
+      `;
+
+      cell.addEventListener("click", () => openCompartmentModal(house, comp.id));
+      return cell;
+    }
+
+    function renderWardrobe() {
+      const house = state.activeHouse;
+      const w = WARDROBES[house];
+      document.getElementById("mainWardrobeTitle").textContent = w.name;
+
+      const papaUnits = state.clothes.filter(c => c.house === "papa").reduce((s, c) => s + (c.qty || 1), 0);
+      const mamaUnits = state.clothes.filter(c => c.house === "mama").reduce((s, c) => s + (c.qty || 1), 0);
+      document.getElementById("badgePapa").textContent = papaUnits;
+      document.getElementById("badgeMama").textContent = mamaUnits;
+
+      const shell = document.getElementById("mainWardrobeShell");
+      shell.innerHTML = "";
+
+      if (house === "papa") {
+        const grid = document.createElement("div");
+        grid.className = "grid-papa";
+        const top = document.createElement("div");
+        top.className = "papa-top";
+        const bottom = document.createElement("div");
+        bottom.className = "papa-bottom";
+        const left = document.createElement("div");
+        left.className = "papa-col";
+        const right = document.createElement("div");
+        right.className = "papa-col";
+
+        w.compartments.forEach(c => {
+          const node = createCompartmentNode(c, "papa");
+          if (c.zone === "top") top.appendChild(node);
+          else if (c.zone === "bottom-left") left.appendChild(node);
+          else right.appendChild(node);
+        });
+
+        bottom.appendChild(left);
+        bottom.appendChild(right);
+        grid.appendChild(top);
+        grid.appendChild(bottom);
+        shell.appendChild(grid);
+      } else {
+        const grid = document.createElement("div");
+        grid.className = "grid-mama";
+        const colL = document.createElement("div");
+        colL.className = "mama-col";
+        const colC = document.createElement("div");
+        colC.className = "mama-col";
+        const colR = document.createElement("div");
+        colR.className = "mama-col";
+
+        w.compartments.forEach(c => {
+          const node = createCompartmentNode(c, "mama");
+          if (c.zone === "col-left") colL.appendChild(node);
+          else if (c.zone === "col-center") colC.appendChild(node);
+          else colR.appendChild(node);
+        });
+
+        grid.appendChild(colL);
+        grid.appendChild(colC);
+        grid.appendChild(colR);
+        shell.appendChild(grid);
+      }
+    }
+
+    /******************************************************************
+     * 5. MODAL AÑADIR PRENDA (CON CANTIDAD + MICRO-ARMARIO PULSABLE)
+     ******************************************************************/
+    function populateFormSelects() {
+      document.getElementById("selType").innerHTML =
+        state.types.map(t => `<option value="${t.name}">${t.name}</option>`).join("");
+      document.getElementById("selColor").innerHTML =
+        state.colors.map(c => `<option value="${c.name}">${c.name}</option>`).join("");
+    }
+
+    window.setAddQty = function(val) {
+      const clean = Math.max(1, Math.min(99, parseInt(val, 10) || 1));
+      document.getElementById("inputQty").value = clean;
+      syncQtyPresets();
+    };
+
+    window.stepAddQty = function(delta) {
+      const cur = parseInt(document.getElementById("inputQty").value, 10) || 1;
+      setAddQty(cur + delta);
+    };
+
+    window.syncQtyPresets = function() {
+      const cur = parseInt(document.getElementById("inputQty").value, 10) || 1;
+      document.querySelectorAll("#qtyPresetsRow .preset-pill").forEach(btn => {
+        btn.classList.toggle("active", parseInt(btn.dataset.q, 10) === cur);
+      });
+    };
+
+    window.openAddModal = function(preselectedHouse = null) {
+      state.movingGarmentId = null;
+      populateFormSelects();
+      setAddQty(1);
+      document.getElementById("inputNote").value = "";
+      document.getElementById("addSheetTitle").textContent = "Añadir ropa";
+      document.getElementById("addFieldsBlock").style.display = "flex";
+      document.getElementById("pickerBannerText").textContent =
+        "👇 Toca la balda, cajón o colgador y se guardará al instante";
+
+      switchPickerHouse(preselectedHouse || state.activeHouse);
+      document.getElementById("modalAdd").classList.add("open");
+    };
+
+    window.openMoveModal = function(garmentId) {
+      const item = state.clothes.find(c => c.id === garmentId);
+      if (!item) return;
+      state.movingGarmentId = garmentId;
+      document.getElementById("addSheetTitle").textContent = `Mover: ${item.type} (${item.color})`;
+      document.getElementById("addFieldsBlock").style.display = "none";
+      document.getElementById("pickerBannerText").textContent =
+        "👇 Elige la casa y toca el nuevo hueco para mover la prenda";
+
+      switchPickerHouse(item.house);
+      document.getElementById("modalAdd").classList.add("open");
+    };
+
+    window.closeAddModal = function() {
+      document.getElementById("modalAdd").classList.remove("open");
+    };
+
+    window.switchPickerHouse = function(house) {
+      state.pickerHouse = house;
+      document.getElementById("pickerBtnPapa").classList.toggle("active", house === "papa");
+      document.getElementById("pickerBtnMama").classList.toggle("active", house === "mama");
+      renderMiniWardrobe();
+    };
+
+    function renderMiniWardrobe() {
+      const house = state.pickerHouse;
+      const w = WARDROBES[house];
+      const container = document.getElementById("miniWardrobeContainer");
+      container.innerHTML = "";
+
+      function makeSlot(comp) {
+        const div = document.createElement("div");
+        const isDisabled = comp.type === "inactivo";
+        div.className = `mini-slot ${isDisabled ? "disabled" : ""}`;
+        div.style.flex = String(comp.ratio || 1);
+        div.textContent = comp.name;
+        if (!isDisabled) {
+          div.addEventListener("click", () => onSelectMiniSlot(house, comp));
+        }
+        return div;
+      }
+
+      if (house === "papa") {
+        const grid = document.createElement("div");
+        grid.className = "grid-papa";
+        const top = document.createElement("div");
+        top.className = "papa-top";
+        const bottom = document.createElement("div");
+        bottom.className = "papa-bottom";
+        const left = document.createElement("div");
+        left.className = "papa-col";
+        const right = document.createElement("div");
+        right.className = "papa-col";
+
+        w.compartments.forEach(c => {
+          const s = makeSlot(c);
+          if (c.zone === "top") top.appendChild(s);
+          else if (c.zone === "bottom-left") left.appendChild(s);
+          else right.appendChild(s);
+        });
+
+        bottom.appendChild(left);
+        bottom.appendChild(right);
+        grid.appendChild(top);
+        grid.appendChild(bottom);
+        container.appendChild(grid);
+      } else {
+        const grid = document.createElement("div");
+        grid.className = "grid-mama";
+        const colL = document.createElement("div");
+        colL.className = "mama-col";
+        const colC = document.createElement("div");
+        colC.className = "mama-col";
+        const colR = document.createElement("div");
+        colR.className = "mama-col";
+
+        w.compartments.forEach(c => {
+          const s = makeSlot(c);
+          if (c.zone === "col-left") colL.appendChild(s);
+          else if (c.zone === "col-center") colC.appendChild(s);
+          else colR.appendChild(s);
+        });
+
+        grid.appendChild(colL);
+        grid.appendChild(colC);
+        grid.appendChild(colR);
+        container.appendChild(grid);
+      }
+    }
+
+    function onSelectMiniSlot(house, comp) {
+      if (state.movingGarmentId) {
+        const item = state.clothes.find(c => c.id === state.movingGarmentId);
+        if (item) {
+          item.house = house;
+          item.compId = comp.id;
+          saveState();
+          switchHouse(house);
+          renderAll();
+          if (state.openCompModal) {
+            openCompartmentModal(state.openCompModal.house, state.openCompModal.compId);
+          }
+          showToast(`Movido a ${comp.name}`);
+        }
+        closeAddModal();
+        return;
+      }
+
+      const type = document.getElementById("selType").value;
+      const color = document.getElementById("selColor").value;
+      const qty = Math.max(1, parseInt(document.getElementById("inputQty").value, 10) || 1);
+      const note = document.getElementById("inputNote").value.trim();
+
+      state.clothes.unshift({
+        id: "g-" + Date.now(),
+        type,
+        color,
+        qty,
+        note,
+        house,
+        compId: comp.id
+      });
+
+      saveState();
+      closeAddModal();
+      switchHouse(house);
+      renderAll();
+      showToast(`Añadido: ×${qty} ${type} (${color}) en ${comp.name}`);
+    }
+
+    /******************************************************************
+     * 6. MODAL CONTENIDO DE UN COMPARTIMENTO
+     ******************************************************************/
+    window.openCompartmentModal = function(house, compId) {
+      state.openCompModal = { house, compId };
+      const comp = WARDROBES[house].compartments.find(c => c.id === compId);
+      if (!comp) return;
+
+      const items = state.clothes.filter(c => c.house === house && c.compId === compId);
+      const totalUnits = items.reduce((s, i) => s + (i.qty || 1), 0);
+
+      document.getElementById("compSheetTitle").textContent =
+        `${comp.name} · ${house === "papa" ? "Casa de Papá" : "Casa de Mamá"}`;
+      document.getElementById("compSheetSub").textContent =
+        `${totalUnits} unidad(es) en ${items.length} ficha(s)`;
+
+      document.getElementById("btnAddInsideComp").onclick = () => {
+        closeCompartmentModal();
+        openAddModal(house);
+      };
+
+      const list = document.getElementById("compItemsContainer");
+      if (items.length === 0) {
+        list.innerHTML = `
+          <div style="text-align:center; padding:32px 14px; color:var(--text-secondary); font-weight:600;">
+            No hay ropa en este compartimento.
+          </div>
+        `;
+      } else {
+        list.innerHTML = items.map(item => `
+          <div class="list-row-apple">
+            <div style="display:flex; align-items:center; gap:12px; min-width:0; flex:1;">
+              <div style="width:40px; height:40px; flex-shrink:0;">
+                ${getCompactGarmentSvg(item.type, item.color)}
+              </div>
+              <div style="min-width:0;">
+                <div style="font-weight:800; font-size:0.95rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                  ${item.type} ${item.note ? "· " + item.note : ""}
+                </div>
+                <div style="font-size:0.8rem; font-weight:600; color:var(--text-secondary); display:flex; align-items:center; gap:5px;">
+                  <span class="color-dot" style="background:${getColorHex(item.color)};"></span>
+                  ${item.color}
+                </div>
+              </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <div class="inline-stepper">
+                <button type="button" class="step-mini-btn" onclick="updateItemQty('${item.id}', -1)">−</button>
+                <span class="step-mini-val">×${item.qty || 1}</span>
+                <button type="button" class="step-mini-btn" onclick="updateItemQty('${item.id}', 1)">＋</button>
+              </div>
+              <button type="button" class="btn-chip" onclick="openMoveModal('${item.id}')">Mover</button>
+              <button type="button" class="btn-chip danger" onclick="removeGarment('${item.id}')">✕</button>
+            </div>
+          </div>
+        `).join("");
+      }
+
+      document.getElementById("modalCompartment").classList.add("open");
+    };
+
+    window.closeCompartmentModal = function() {
+      state.openCompModal = null;
+      document.getElementById("modalCompartment").classList.remove("open");
+    };
+
+    window.updateItemQty = function(id, delta) {
+      const item = state.clothes.find(c => c.id === id);
+      if (!item) return;
+      const next = (item.qty || 1) + delta;
+      if (next <= 0) {
+        removeGarment(id);
+        return;
+      }
+      item.qty = next;
+      saveState();
+      renderAll();
+      if (state.openCompModal) {
+        openCompartmentModal(state.openCompModal.house, state.openCompModal.compId);
+      }
+    };
+
+    window.removeGarment = function(id) {
+      state.clothes = state.clothes.filter(c => c.id !== id);
+      saveState();
+      renderAll();
+      if (state.openCompModal) {
+        openCompartmentModal(state.openCompModal.house, state.openCompModal.compId);
+      }
+      showToast("Prenda eliminada");
+    };
+
+    /******************************************************************
+     * 7. INVENTARIO INFERIOR Y FILTROS
+     ******************************************************************/
+    function updateFilterSelects() {
+      const fType = document.getElementById("filterType");
+      const curT = fType.value;
+      fType.innerHTML = `<option value="">Todos los tipos</option>` +
+        state.types.map(t => `<option value="${t.name}">${t.name}</option>`).join("");
+      fType.value = curT;
+
+      const fCol = document.getElementById("filterColor");
+      const curC = fCol.value;
+      fCol.innerHTML = `<option value="">Todos los colores</option>` +
+        state.colors.map(c => `<option value="${c.name}">${c.name}</option>`).join("");
+      fCol.value = curC;
+    }
+
+    function getCompLabel(house, compId) {
+      const c = WARDROBES[house]?.compartments.find(x => x.id === compId);
+      return c ? c.name : "Armario";
+    }
+
+    window.renderInventory = function() {
+      updateFilterSelects();
+      const q = document.getElementById("searchInput").value.trim().toLowerCase();
+      const house = document.getElementById("filterHouse").value;
+      const type = document.getElementById("filterType").value;
+      const color = document.getElementById("filterColor").value;
+
+      const filtered = state.clothes.filter(item => {
+        if (house && item.house !== house) return false;
+        if (type && item.type !== type) return false;
+        if (color && item.color !== color) return false;
+        if (q) {
+          const hay = `${item.type} ${item.color} ${item.note || ""}`.toLowerCase();
+          if (!hay.includes(q)) return false;
+        }
+        return true;
+      });
+
+      const totalUnits = filtered.reduce((s, i) => s + (i.qty || 1), 0);
+      document.getElementById("totalInventorySubtitle").textContent =
+        `${totalUnits} unidad(es) en ${filtered.length} ficha(s)`;
+
+      const grid = document.getElementById("inventoryGrid");
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:32px; color:var(--text-secondary); font-weight:600;">No hay prendas que coincidan con la búsqueda.</div>`;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(item => {
+        const houseLabel = item.house === "papa" ? "Casa de Papá" : "Casa de Mamá";
+        const compLabel = getCompLabel(item.house, item.compId);
+        const qty = item.qty || 1;
+
+        return `
+          <div class="garment-tile">
+            <div class="tile-top">
+              <div class="tile-icon-box">
+                <div style="width:40px; height:40px;">${getCompactGarmentSvg(item.type, item.color)}</div>
+                <span class="tile-qty-tag">×${qty}</span>
+              </div>
+              <div class="tile-info">
+                <div class="tile-title">${item.type} ${item.note ? "· " + item.note : ""}</div>
+                <div class="tile-sub">
+                  <span class="color-dot" style="background:${getColorHex(item.color)};"></span>
+                  ${item.color}
+                </div>
+              </div>
+            </div>
+
+            <div class="tile-location">
+              <span>${houseLabel}</span>
+              <span style="color:var(--text-secondary);">${compLabel}</span>
+            </div>
+
+            <div class="tile-footer">
+              <div class="inline-stepper">
+                <button type="button" class="step-mini-btn" onclick="updateItemQty('${item.id}', -1)" title="Restar 1">−</button>
+                <span class="step-mini-val">×${qty}</span>
+                <button type="button" class="step-mini-btn" onclick="updateItemQty('${item.id}', 1)" title="Sumar 1">＋</button>
+              </div>
+              <div style="display:flex; gap:6px;">
+                <button type="button" class="btn-chip" onclick="openMoveModal('${item.id}')">Mover</button>
+                <button type="button" class="btn-chip danger" onclick="removeGarment('${item.id}')">Borrar</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    };
+
+    window.resetFilters = function() {
+      document.getElementById("searchInput").value = "";
+      document.getElementById("filterHouse").value = "";
+      document.getElementById("filterType").value = "";
+      document.getElementById("filterColor").value = "";
+      renderInventory();
+    };
+
+    /******************************************************************
+     * 8. GESTIÓN DE LISTAS (TIPOS DE PRENDA, COLORES Y COPIA)
+     ******************************************************************/
+    window.openListsModal = function() {
+      renderEditableLists();
+      document.getElementById("modalLists").classList.add("open");
+    };
+
+    window.closeListsModal = function() {
+      document.getElementById("modalLists").classList.remove("open");
+    };
+
+    window.switchListsTab = function(tab) {
+      document.getElementById("tabConfigTypes").classList.toggle("active", tab === "types");
+      document.getElementById("tabConfigColors").classList.toggle("active", tab === "colors");
+      document.getElementById("tabConfigBackup").classList.toggle("active", tab === "backup");
+
+      document.getElementById("panelConfigTypes").style.display = tab === "types" ? "flex" : "none";
+      document.getElementById("panelConfigColors").style.display = tab === "colors" ? "flex" : "none";
+      document.getElementById("panelConfigBackup").style.display = tab === "backup" ? "flex" : "none";
+    };
+
+    function renderEditableLists() {
+      document.getElementById("typesListContainer").innerHTML = state.types.map((t, idx) => `
+        <div class="list-row-apple">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <div style="width:28px; height:28px;">${getCompactGarmentSvg(t.name, "Azul oscuro")}</div>
+            <strong style="font-weight:800;">${t.name}</strong>
+          </div>
+          <div style="display:flex; gap:6px;">
+            <button type="button" class="btn-chip" onclick="renameTypeItem(${idx})">Editar</button>
+            <button type="button" class="btn-chip danger" onclick="deleteTypeItem(${idx})">✕</button>
+          </div>
+        </div>
+      `).join("");
+
+      document.getElementById("colorsListContainer").innerHTML = state.colors.map((c, idx) => `
+        <div class="list-row-apple">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span class="color-dot" style="width:20px; height:20px; background:${c.hex};"></span>
+            <strong style="font-weight:800;">${c.name}</strong>
+          </div>
+          <div style="display:flex; gap:6px;">
+            <button type="button" class="btn-chip" onclick="renameColorItem(${idx})">Editar</button>
+            <button type="button" class="btn-chip danger" onclick="deleteColorItem(${idx})">✕</button>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    window.addTypeItem = function() {
+      const inp = document.getElementById("newTypeInput");
+      const shape = document.getElementById("newTypeShape").value;
+      const name = inp.value.trim();
+      if (!name) return;
+      if (state.types.some(t => t.name.toLowerCase() === name.toLowerCase())) {
+        alert("Ese tipo de prenda ya existe.");
+        return;
+      }
+      state.types.push({ name, shape });
+      inp.value = "";
+      saveState();
+      renderEditableLists();
+      renderAll();
+      showToast(`Tipo «${name}» añadido`);
+    };
+
+    window.renameTypeItem = function(idx) {
+      const item = state.types[idx];
+      if (!item) return;
+      const nuevo = prompt("Nuevo nombre del tipo de prenda:", item.name);
+      if (!nuevo || !nuevo.trim()) return;
+      const oldName = item.name;
+      item.name = nuevo.trim();
+      state.clothes.forEach(c => { if (c.type === oldName) c.type = item.name; });
+      saveState();
+      renderEditableLists();
+      renderAll();
+    };
+
+    window.deleteTypeItem = function(idx) {
+      if (state.types.length <= 1) return;
+      state.types.splice(idx, 1);
+      saveState();
+      renderEditableLists();
+      renderAll();
+    };
+
+    window.addColorItem = function() {
+      const inp = document.getElementById("newColorInput");
+      const hex = document.getElementById("newColorPicker").value;
+      const name = inp.value.trim();
+      if (!name) return;
+      if (state.colors.some(c => c.name.toLowerCase() === name.toLowerCase())) {
+        alert("Ese color ya existe.");
+        return;
+      }
+      state.colors.push({ name, hex });
+      inp.value = "";
+      saveState();
+      renderEditableLists();
+      renderAll();
+      showToast(`Color «${name}» añadido`);
+    };
+
+    window.renameColorItem = function(idx) {
+      const item = state.colors[idx];
+      if (!item) return;
+      const nuevo = prompt("Nuevo nombre para el color:", item.name);
+      if (!nuevo || !nuevo.trim()) return;
+      const oldName = item.name;
+      item.name = nuevo.trim();
+      state.clothes.forEach(c => { if (c.color === oldName) c.color = item.name; });
+      saveState();
+      renderEditableLists();
+      renderAll();
+    };
+
+    window.deleteColorItem = function(idx) {
+      if (state.colors.length <= 1) return;
+      state.colors.splice(idx, 1);
+      saveState();
+      renderEditableLists();
+      renderAll();
+    };
+
+    window.exportDataJson = function() {
+      const payload = { types: state.types, colors: state.colors, clothes: state.clothes };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "mi-armario-apple.json";
+      a.click();
+    };
+
+    window.importDataJson = function(ev) {
+      const file = ev.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const data = JSON.parse(e.target.result);
+          if (Array.isArray(data.clothes)) {
+            state.clothes = data.clothes.map(item => ({
+              ...item,
+              qty: Math.max(1, parseInt(item.qty, 10) || 1)
+            }));
+            if (Array.isArray(data.types)) state.types = data.types;
+            if (Array.isArray(data.colors)) state.colors = data.colors;
+            saveState();
+            renderAll();
+            closeListsModal();
+            showToast("Copia restaurada con éxito");
+          }
+        } catch (err) {
+          alert("Archivo no válido.");
+        }
+      };
+      reader.readAsText(file);
+    };
+
+    window.clearAllInventory = function() {
+      if (!confirm("¿Seguro que quieres borrar todas las prendas de ambos armarios?")) return;
+      state.clothes = [];
+      saveState();
+      renderAll();
+      closeListsModal();
+      showToast("Armarios vaciados");
+    };
+
+    function renderAll() {
+      renderWardrobe();
+      renderInventory();
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      loadState();
+      renderAll();
+    });
+  </script>
+</body>
+</html>
